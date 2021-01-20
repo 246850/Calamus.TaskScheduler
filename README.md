@@ -19,3 +19,21 @@ http://47.101.47.193:1063/
 > --命令行启动 dotnet Calamus.TaskScheduler.dll
 
 > --IIS部署（不推荐）
+**配置文件**
+```
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AllowedHosts": "*",
+  "Quartz": {
+    "Database": "server=localhost;port=3306;database=quartz;User ID=root;Password=123456", // quartz 持久化数据库连接，本实例使用MySQL
+    "TablePrefix": "QRTZ_"  // MySQL下注意区分大小写
+  }
+}
+
+```
