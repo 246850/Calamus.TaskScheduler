@@ -34,7 +34,9 @@
 #*.modelproj merge=binary
 #*.sqlproj   merge=binary
 #*.wwaproj   merge=binary
-
+*.js linguist-language=csharp
+*.css linguist-language=csharp
+*.html linguist-language=csharp
 ###############################################################################
 # behavior for image files
 #
