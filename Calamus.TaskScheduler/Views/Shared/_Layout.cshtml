@@ -1,0 +1,206 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"] - TaskScheduler</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/adminlte3/plugins/fontawesome-free/css/all.min.css">
+    <!-- Tempusdominus Bootstrap 4 -->
+    <link rel="stylesheet" href="~/adminlte3/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/adminlte3/dist/css/adminlte.min.css">
+    <!-- overlayScrollbars -->
+    <link rel="stylesheet" href="~/adminlte3/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <style type="text/css">
+        .sidebar-dark-bg {
+            background-color: #222d32;
+        }
+
+        .navbar-lightblue20 {
+            background: #367fa9;
+        }
+
+        [class*=sidebar-dark] .brand-link {
+            border-bottom: none;
+        }
+
+        #menu-header {
+            color: #ffffff;
+            background: #1a2226;
+            overflow: hidden;
+            text-overflow: clip;
+            white-space: nowrap;
+            padding-top: .5rem;
+            padding-bottom: .5rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            font-size: 1rem;
+        }
+        .modal {
+            background: rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand fixed-top navbar-dark navbar-lightblue border-bottom-0">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+
+            <!-- Right navbar links -->
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+                        <i class="fas fa-expand-arrows-alt"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <!-- /.navbar -->
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-primary sidebar-dark-bg">
+            <!-- Brand Logo -->
+            <a asp-controller="Home" asp-action="Index" class="brand-link navbar-lightblue20">
+                <span class="brand-image img-circle brand-mini" style="line-height: inherit; margin-top: 0">TASK</span>
+                <span class="brand-text font-weight-light">任务调度</span>
+            </a>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar Menu -->
+                <nav class="mt-0">
+                    <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent nav-flat nav-compact" data-widget="treeview" role="menu" data-accordion="false">
+                        <!-- Add icons to the links using the .nav-icon class
+                        with font-awesome or any other icon font library -->
+                        <li class="nav-header" id="menu-header"><i class="nav-icon fas fa-desktop"></i><span>控制面板</span></li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index", "Home")" class="nav-link">
+                                <i class="nav-icon fas fa-tasks"></i>
+                                <p>
+                                    任务管理
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Notice", "Home")" class="nav-link">
+                                <i class="nav-icon fas fa-rss"></i>
+                                <p>
+                                    邮件通知
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Info", "Home")" class="nav-link">
+                                <i class="nav-icon fas fa-server"></i>
+                                <p>
+                                    服务状态
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="https://cron.qqe2.com/" class="nav-link" target="_blank">
+                                <i class="nav-icon fas fa-columns"></i>
+                                <p>
+                                    Cron表达式
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- /.content-header -->
+            <!-- Main content -->
+            <section class="content">
+                <div style="height:70px;">&nbsp;</div>
+                <div class="container-fluid">
+                    @RenderBody()
+                </div><!-- /.container-fluid -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark">
+            <!-- Control sidebar content goes here -->
+        </aside>
+        <!-- /.control-sidebar -->
+    </div>
+    <!-- ./wrapper -->
+    <!-- modal -->
+    <div class="modal fade" id="_modal" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content bg-primary">
+                <div class="modal-header">
+                    <h4 class="modal-title"><i class="fa fa-info"></i>操作提示</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="_modal_body"></p>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- jQuery -->
+    <script src="~/adminlte3/plugins/jquery/jquery.min.js"></script>
+    <!-- layer -->
+    <script src="~/layer/layer.js"></script>
+    <!-- moment -->
+    <script src="~/adminlte3/plugins/moment/moment.min.js"></script>
+    <script src="~/adminlte3/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="~/adminlte3/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+    <!-- overlayScrollbars -->
+    <script src="~/adminlte3/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="~/adminlte3/dist/js/adminlte.js"></script>
+    <script>
+        function getMaxZIndex() {
+            var maxZ = Math.max.apply(null,
+                $.map($('body *'), function (e, n) {
+                    if ($(e).css('position') != 'static')
+                        return parseInt($(e).css('z-index')) || 1;
+                }));
+            return maxZ;
+        }
+        function _doModal(msg) {
+            $("#_modal_body").html(msg);
+            $('#_modal').css("z-index", getMaxZIndex() + 1).modal('show').on("hidden.bs.modal", function () {
+                // to do
+            });
+        }
+
+        $(function () {
+            let flag;
+            $(".nav-sidebar li a").each(function () {
+                var href = $(this).attr("href");
+                if (window.location.pathname == href) {
+                    $(this).addClass("active");
+                    flag = true;
+                    return false;
+                }
+            });
+            if (!flag) {
+                $(".nav-sidebar li a:eq(1)").addClass("active");
+            }
+        })
+    </script>
+    @RenderSection("Scripts", false)
+</body>
+</html>

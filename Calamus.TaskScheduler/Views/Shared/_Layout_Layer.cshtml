@@ -1,0 +1,34 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"] - TaskScheduler</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/adminlte3/plugins/fontawesome-free/css/all.min.css">
+    <!-- Tempusdominus Bootstrap 4 -->
+    <link rel="stylesheet" href="~/adminlte3/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/adminlte3/dist/css/adminlte.min.css">
+    <style type="text/css">
+        #sys-ajax-loading {position: fixed;z-index: 1000;left: 6px;top: 6px;display: none;padding: 7px 10px 7px 10px;}
+    </style>
+</head>
+<body>
+    <div id="sys-ajax-loading" class="bg-orange color-palette"><i class="fa fa-spinner"></i>loading...</div>
+    @RenderBody()
+    <!-- jQuery -->
+    <script src="~/adminlte3/plugins/jquery/jquery.min.js"></script>
+    <!-- laydate -->
+    <script src="~/laydate/laydate.js"></script>
+    <!-- moment -->
+    <script src="~/adminlte3/plugins/moment/moment.min.js"></script>
+    <!-- Tempusdominus Bootstrap 4 -->
+    <script src="~/adminlte3/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="~/adminlte3/dist/js/adminlte.js"></script>
+    <script src="~/jquery.form.js"></script>
+    @RenderSection("Scripts", false)
+</body>
+</html>

@@ -1,0 +1,116 @@
+﻿@model JobCreateOrUpdateRequest
+@{
+    ViewData["Title"] = "新增/编辑任务";
+    Layout = "../Shared/_Layout_Layer.cshtml";
+}
+<form id="form_0" class="form-horizontal" action="@Url.Action("CreateOrUpdate", "Home")" method="post" onsubmit="return false;">
+    <div class="card-body">
+        <div class="form-group row">
+            <label for="@Html.IdFor(model=> model.Group)" class="col-sm-1 col-form-label">分组名称</label>
+            <div class="col-sm-5">
+                <input type="text" class="form-control" asp-for="Group" placeholder="必填" required>
+            </div>
+            <label for="@Html.IdFor(model=> model.Name)" class="col-sm-1 col-form-label">任务名称</label>
+            <div class="col-sm-5">
+                <input type="text" class="form-control" asp-for="Name" placeholder="必填" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="@Html.IdFor(model=> model.HttpMethod)" class="col-sm-1 col-form-label">请求方式</label>
+            <div class="col-sm-5">
+                <select asp-for="HttpMethod" asp-items="Model.Properties[PropertiesKeys.Key_1]" class="form-control"></select>
+            </div>
+            <label for="@Html.IdFor(model=> model.RequestUrl)" class="col-sm-1 col-form-label">请求地址</label>
+            <div class="col-sm-5">
+                <input type="url" class="form-control" asp-for="RequestUrl" placeholder="必填" required>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="@Html.IdFor(model=> model.StartTime)" class="col-sm-1 col-form-label">开始时间</label>
+            <div class="col-sm-5">
+                <input type="text" name="@Html.IdFor(model=> model.StartTime)" class="form-control" value="@Model.StartTime?.ToString("yyyy-MM-dd HH:mm:ss")" placeholder="必填" data-toggle="datetime" required>
+            </div>
+            <label for="@Html.IdFor(model=> model.EndTime)" class="col-sm-1 col-form-label">结束时间</label>
+            <div class="col-sm-5">
+                <input type="text" name="@Html.IdFor(model=> model.EndTime)" class="form-control" value="@Model.EndTime?.ToString("yyyy-MM-dd HH:mm:ss")" data-toggle="datetime">
+            </div>
+        </div>
+        <div class="form-group row" id="triggers">
+            <label for="@Html.IdFor(model=> model.TriggerType)" class="col-sm-1 col-form-label">触发类型</label>
+            <div class="col-sm-5">
+                <select asp-for="TriggerType" asp-items="Model.Properties[PropertiesKeys.Key_2]" class="form-control" v-model="triggerType"></select>
+            </div>
+            <label for="@Html.IdFor(model=> model.Interval)" class="col-sm-1 col-form-label" v-if="triggerType == 1">间隔时间</label>
+            <label for="@Html.IdFor(model=> model.Cron)" class="col-sm-1 col-form-label" v-if="triggerType == 2">Cron</label>
+            <div class="col-sm-5">
+                <div class="input-group" v-if="triggerType == 1">
+                    <input type="number" class="form-control" asp-for="Interval" placeholder="必填" min="1" required>
+                    <div class="input-group-append">
+                        <select class="form-control" asp-for="IntervalType" asp-items="Model.Properties[PropertiesKeys.Key_3]"></select>
+                        <input type="number" min="0" placeholder="0：无限次" class="form-control" asp-for="RepeatCount" required title="重复次数，0：无限" />
+                    </div>
+                </div>
+                <div class="input-group" v-if="triggerType == 2">
+                    <input type="text" class="form-control" asp-for="Cron" placeholder="必填" required>
+                    <div class="input-group-append">
+                        <a href="https://cron.qqe2.com/" target="_blank" class="btn btn-flat btn-info">参考</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="@Html.IdFor(model=> model.RequestBody)" class="col-sm-1 col-form-label">请求参数</label>
+            <div class="col-sm-11">
+                <textarea class="form-control" asp-for="RequestBody" placeholder="content-type:application/json"></textarea>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="@Html.IdFor(model=> model.Description)" class="col-sm-1 col-form-label">描述信息</label>
+            <div class="col-sm-11">
+                <textarea class="form-control" asp-for="Description"></textarea>
+            </div>
+        </div>
+    </div>
+    <!-- /.card-body -->
+    <div class="card-footer">
+        @Html.HiddenFor(model => model.IsUpdate)
+        <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i>保存</button>
+    </div>
+    <!-- /.card-footer -->
+</form>
+
+@section Scripts
+{
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script type="text/javascript">
+        var appVue = new Vue({
+            el: '#triggers',
+            data: {
+                triggerType: @Model.TriggerType
+            },
+            mounted: () => {
+            }
+        })
+        $(function () {
+            $("[data-toggle=datetime]").each(function () {
+                //常规用法
+                laydate.render({
+                    elem: $(this).get(0),
+                    type: 'datetime'
+                })
+            });
+            $("#form_0").submit(function () {
+                $(this).ajaxSubmit({
+                    success: function (res) {
+                        parent._doModal(res.msg);
+                        if (res.code === 0) {
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+}

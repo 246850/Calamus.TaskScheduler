@@ -1,0 +1,125 @@
+﻿@model EmailConfigModel
+@{
+    ViewData["Title"] = "邮件通知配置";
+}
+<section class="row">
+    <div class="col-sm-6">
+        <div class="card card-outline card-primary">
+            <div class="card-header">
+                <h3 class="card-title">SMTP邮件服务器配置</h3>
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form id="form_0" class="form-horizontal" asp-controller="Home" asp-action="Notice" method="post" onsubmit="return false;">
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label for="@Html.IdFor(model=> model.Host)" class="col-sm-2 col-form-label">Host：</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" asp-for="Host" placeholder="例：smtp.qq.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="@Html.IdFor(model=> model.Port)" class="col-sm-2 col-form-label">Port：</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" asp-for="Port" placeholder="例：587 | 465" required min="1">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="@Html.IdFor(model=> model.UserName)" class="col-sm-2 col-form-label">发件地址：</label>
+                        <div class="col-sm-10">
+                            <input type="email" class="form-control" asp-for="UserName" placeholder="it@example.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="@Html.IdFor(model=> model.NickName)" class="col-sm-2 col-form-label">显示名称：</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" asp-for="NickName" placeholder="Quartz.NET任务调度通知" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="@Html.IdFor(model=> model.Password)" class="col-sm-2 col-form-label">认证密码：</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" asp-for="Password" placeholder="发件邮箱认证密码" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="@Html.IdFor(model=> model.To)" class="col-sm-2 col-form-label">收件地址：</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" asp-for="To" placeholder="支持多个，以;分隔。例：it001@example.com;it002@example.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="@Html.IdFor(model=> model.CacheExpiry)" class="col-sm-2 col-form-label">通知间隔：</label>
+                        <div class="col-sm-10">
+                            <input type="number" class="form-control" asp-for="CacheExpiry" placeholder="单位：分钟，每多少分钟通知一次" required min="1">
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i>保存</button>
+                </div>
+                <!-- /.card-footer -->
+            </form>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="card card-outline card-primary">
+            <div class="card-header">
+                <h3 class="card-title">邮件测试（注：测试前，请先配置好SMTP邮件服务器）</h3>
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form id="form_1" class="form-horizontal" asp-controller="Home" asp-action="Email" method="post" onsubmit="return false;">
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label for="to" class="col-sm-2 col-form-label">收件地址：</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="to" placeholder="支持多个，以;分隔。例：it001@example.com;it002@example.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="subject" class="col-sm-2 col-form-label">主题：</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="subject" placeholder="" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="body" class="col-sm-2 col-form-label">内容：</label>
+                        <div class="col-sm-10">
+                            <textarea type="text" class="form-control" name="body" placeholder="" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-venus"></i>测试</button>
+                </div>
+                <!-- /.card-footer -->
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts
+{
+    <script src="~/jquery.form.js"></script>
+    <script>
+        $(function () {
+            $("#form_0").submit(function () {
+                $(this).ajaxSubmit({
+                    success: function (res) {
+                        _doModal(res.msg);
+                    }
+                });
+            });
+            $("#form_1").submit(function () {
+                $(this).ajaxSubmit({
+                    success: function (res) {
+                        _doModal(res.msg);
+                    }
+                });
+            });
+        })
+    </script>
+}

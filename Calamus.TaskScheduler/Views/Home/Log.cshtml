@@ -1,0 +1,16 @@
+﻿@model List<string>
+@{
+    ViewData["Title"] = "任务日志";
+    Layout = "../Shared/_Layout_Layer.cshtml";
+}
+@if (Model.Count <= 0)
+{
+    <h3>暂无执行成功日志。</h3>
+}
+@foreach (var item in Model)
+{
+    <blockquote>
+        <p>@item</p>
+    </blockquote>
+
+}

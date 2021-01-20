@@ -1,0 +1,269 @@
+﻿@model JobSearchRequest
+@{
+    ViewData["Title"] = "任务管理";
+}
+<link href="~/kendoui2017/styles/kendo.common.min.css" rel="stylesheet" />
+<link href="~/kendoui2017/styles/kendo.common.core.min.css" rel="stylesheet" />
+<link href="~/kendoui2017/styles/kendo.rtl.min.css" rel="stylesheet" />
+<link href="~/kendoui2017/styles/kendo.bootstrap-v4.min.css" rel="stylesheet" />
+<style type="text/css">
+    .k-grid tr.k-alt {
+        background-color: rgba(0, 0, 0, 0.075)
+    }
+
+    .k-grid td {
+        padding: .3em .5em;
+    }
+
+    .bg-detail {
+        background: #dff0d8
+    }
+</style>
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        <h3 class="card-title">任务管理</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+        <!-- /.card-tools -->
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <form class="form-inline" action="javascript:void(0)" id="form_0">
+            <label class="mb-2 mr-sm-2">所属分组：</label>
+            <select asp-for="Group" asp-items="Model.Properties[PropertiesKeys.Key_1]" class="form-control mb-2 mr-sm-2" onchange="doSearch()"></select>
+            <label class="mb-2 mr-sm-2">任务名称：</label>
+            <input type="text" class="form-control mb-2 mr-sm-2" asp-for="Name" placeholder="任务名称">
+            <button type="submit" class="btn btn-primary mb-2 mr-sm-2" onclick="doSearch()"><i class="fas fa-search"></i>查询</button>
+            <button type="button" class="btn btn-success mb-2" onclick="doAdd()"><i class="fas fa-plus"></i>新增</button>
+        </form>
+        <table id="grid"></table>
+    </div>
+    <!-- /.card-body -->
+</div>
+
+@section Scripts
+{
+    <script src="~/kendoui2017/js/kendo.web.min.js"></script>
+    <script src="~/kendoui2017/js/messages/kendo.messages.zh-CN.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#grid").kendoGrid({
+                dataSource: {
+                    transport: {
+                        read: {
+                            url: "@Url.Action("Jobs", "Home")",
+                            type: "post",
+                            data: () => {
+                                return {
+                                    "@Html.IdFor(model=> model.Name)": $("#@Html.IdFor(model=> model.Name)").val(),
+                                    "@Html.IdFor(model=> model.Group)": $("#@Html.IdFor(model=> model.Group)").val()
+                                }
+                            }
+                        }
+                    },
+                    schema: {
+                        data: "data",
+                        error: "msg"
+                    }
+                },
+                scrollable: false,
+                noRecords: true,
+                columns: [
+                    {
+                        field: "name",
+                        title: "任务名称"
+                    },
+                    {
+                        field: "triggerState",
+                        title: "状态",
+                        width: 70,
+                        template: model => {
+                            if (model.triggerState == 0) return "<span class='text-primary'>正常</span>";
+                            if (model.triggerState == 1) return "<span class='text-info'>暂停</span>";
+                            if (model.triggerState == 2) return "<span class='text-green'>完成</span>";
+                            if (model.triggerState == 3) return "<span class='text-red'>错误</span>";
+                            if (model.triggerState == 4) return "<span class='text-warning'>阻塞</span>";
+                            return "Unkown";
+                        }
+                    },
+                    {
+                        field: "requestUrl",
+                        title: "请求信息",
+                        template: function (model) {
+                            return model.httpMethodName + " | " + model.requestUrl;
+                        }
+                    },
+                    {
+                        field: "lastException", title: "异常", width: 80, template: function (model) {
+                            if (model.lastException && model.lastException.length > 0) {
+                                return `<button type="button" class="btn btn-outline-danger btn-xs" data-ex="${model.lastException}" onclick="doException(this)"><i class="fas fa-bug"></i>异常</button>`;
+                            }
+                            return "";
+                        }
+                    },
+                    {
+                        field: "prevFireTime",
+                        title: "上次执行",
+                        width: 180
+                    },
+                    {
+                        field: "nextFireTime",
+                        title: "下次执行",
+                        width: 180
+                    },
+                    {
+                        field: "firePlan",
+                        title: "执行频率"
+                    },
+                    {
+                        field: "id", title: "操作", width: 280, template: function (model) {
+                            let html = `<button type="button" class="btn btn-secondary btn-xs mr-sm-2" onclick="doUpdate('${model.name}','${model.group}')"><i class="fas fa-pen"></i>编辑</button>`;
+                            html += `<button type="button" class="btn btn-info btn-xs mr-sm-2" onclick="doLog('${model.name}','${model.group}')"><i class="fas fa-file-text"></i>日志</button>`;
+                            html += `<button type="button" class="btn bg-navy btn-xs mr-sm-2" onclick="doTrigger('${model.name}','${model.group}')"><i class="fas fa-play"></i>执行</button>`;
+                            if (model.triggerState != 1 && model.triggerState != 2) {
+                                html += `<button type="button" class="btn bg-purple btn-xs mr-sm-2" onclick="doPause('${model.name}','${model.group}')"><i class="fas fa-pause"></i>暂停</button>`;
+                            }
+                            if (model.triggerState == 1 && model.triggerState != 2) {
+                                html += `<button type="button" class="btn btn-warning btn-xs mr-sm-2" onclick="doResume('${model.name}','${model.group}')"><i class="fas fa-play"></i>恢复</button>`;
+                            }
+                            html += `<button type="button" class="btn btn-danger btn-xs mr-sm-2" onclick="doDelete('${model.name}','${model.group}')"><i class="fas fa-trash"></i>移除</button>`;
+                            return html;
+                        }
+                    }
+                ],
+                detailTemplate: kendo.template($("#template").html()),
+                dataBound: function (e) {
+                    e.sender.expandRow(".k-master-row:first");
+                }
+            });
+        });
+        function doSearch() {
+            $("#grid").data('kendoGrid').dataSource.read();
+        }
+        function doAdd() {
+            layer.open({
+                title: "新增任务",
+                type: 2,
+                area: ['60%', '70%'],
+                shadeClose: true, //点击遮罩关闭
+                skin: 'layui-layer-rim', //加上边框
+                content: '@Url.Action("CreateOrUpdate", "Home")?group=' + $("#@Html.IdFor(model=> model.Group)").val(),
+                end: function () {
+                    doSearch();
+                }
+            });
+        }
+        function doUpdate(name, group) {
+            layer.open({
+                title: "编辑任务",
+                type: 2,
+                area: ['60%', '70%'],
+                shadeClose: true, //点击遮罩关闭
+                skin: 'layui-layer-rim', //加上边框
+                content: `@Url.Action("CreateOrUpdate", "Home")?group=${group}&name=${name}`,
+                end: function () {
+                    doSearch();
+                }
+            });
+        }
+        function doTrigger(name, group) {
+            $.post(`@Url.Action("Trigger", "Home")?name=${name}&group=${group}`, function (res) {
+                layer.msg("执行成功");
+            });
+        }
+        function doPause(name, group) {
+            layer.confirm(`确定暂停任务：${name}`, {
+                title: '<i class="fas fa-info"></i>提示',
+                btn: ['确定', '取消'] //按钮
+            }, function (index) {
+                    layer.close(index);
+                    $.post(`@Url.Action("Pause", "Home")?name=${name}&group=${group}`, function (res) {
+                        doSearch();
+                    });
+            }, function () {});
+        }
+        function doResume(name, group) {
+            $.post(`@Url.Action("Resume", "Home")?name=${name}&group=${group}`, function (res) {
+                doSearch();
+            });
+        }
+        function doDelete(name, group) {
+            layer.confirm(`确定删除任务：${name}，删除后数据将无法恢复`, {
+                title: '<i class="fas fa-info"></i>提示',
+                btn: ['确定', '取消'] //按钮
+            }, function (index) {
+                    layer.close(index);
+                    $.post(`@Url.Action("Delete", "Home")?name=${name}&group=${group}`, function (res) {
+                        doSearch();
+                    });
+            }, function () {});
+        }
+        function doException(dom) {
+            layer.open({
+                type: 1,
+                area: ['50%', '50%'],
+                shadeClose: true, //点击遮罩关闭
+                skin: 'layui-layer-rim', //加上边框
+                title: "最后一次异常", //不显示标题
+                content: `<p style='padding:8px'>${$(dom).attr("data-ex")}</p>`
+            });
+        }
+        function doLog(name, group) {
+            layer.open({
+                title: "查看日志",
+                type: 2,
+                area: ['50%', '60%'],
+                shadeClose: true, //点击遮罩关闭
+                skin: 'layui-layer-rim', //加上边框
+                content: `@Url.Action("Log", "Home")?group=${group}&name=${name}`
+            });
+        }
+
+        function buildTriggerTemplate(triggerType, triggerTypeName, interval, intervalTypeName, repeatCount, cron, cronDesc) {
+            if (triggerType === 1) {
+                return triggerTypeName + " | 每" + interval + intervalTypeName + " | " + (repeatCount <= 0 ? "无限次" : `重复${repeatCount}次`);
+            }
+            return triggerTypeName + " | " + cron + " | " + cronDesc;
+        }
+    </script>
+
+    <script type="text/x-kendo-template" id="template">
+        <table class="bg-detail">
+            <tr>
+                <td style="width:10%"><span>触发说明：</span></td>
+                <td style="width:40%">
+                    #= buildTriggerTemplate(triggerType, triggerTypeName, interval, intervalTypeName, repeatCount, cron, cronDesc) #
+                </td>
+                <td style="width:10%"><span>所属分组：</span></td>
+                <td style="width:40%">
+                    #= group #
+                </td>
+            </tr>
+            <tr>
+                <td><span>开始时间：</span></td>
+                <td>
+                    #= startTime #
+                </td>
+                <td><span>结束时间：</span></td>
+                <td>
+                    #= endTime ? endTime:'' #
+                </td>
+            </tr>
+            <tr>
+                <td><span>描述信息：</span></td>
+                <td colspan="3">
+                    #= description ? description:'' #
+                </td>
+            </tr>
+            <tr>
+                <td><span>请求参数：</span></td>
+                <td colspan="3">
+                    #= requestBody ? requestBody:'' #
+                </td>
+            </tr>
+        </table>
+    </script>
+}
