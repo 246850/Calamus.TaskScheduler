@@ -24,7 +24,7 @@ namespace Calamus.TaskScheduler.Infrastructure
             if (httpMethod == (int)HttpMethodEnum.Post)
             {
                 string requestBody = context.JobDetail.JobDataMap.GetString(DataKeys.RequestBody);
-                HttpResponseMessage response = await _http.PostAsync(requestUrl, new StringContent(requestBody, Encoding.UTF8, "application/json"));
+                HttpResponseMessage response = await _http.PostAsync(requestUrl, new StringContent(requestBody ?? string.Empty, Encoding.UTF8, "application/json"));
                 result = await response.Content.ReadAsStringAsync();
             }
             else
