@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Calamus.TaskScheduler.Infrastructure.Dtos
 {
-    public class EmailConfigModel
+    public class EmailConfigRequest
     {
         public string Host { get; set; }
         public int Port { get; set; }
@@ -20,7 +20,7 @@ namespace Calamus.TaskScheduler.Infrastructure.Dtos
         public int CacheExpiry { get; set; }
     }
 
-    public class EmailNoticeCreateValidator : AbstractValidator<EmailConfigModel>
+    public class EmailNoticeCreateValidator : AbstractValidator<EmailConfigRequest>
     {
         public EmailNoticeCreateValidator()
         {

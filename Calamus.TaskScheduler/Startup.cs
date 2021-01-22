@@ -49,13 +49,12 @@ namespace Calamus.TaskScheduler
                     config.RegisterValidatorsFromAssemblyContaining<JobCreateOrUpdateValidator>();
                 });
             services.AddHostedService<NLogHostService>();   // NLog 关闭服务
-            services.AddDistributedMemoryCache();  // 分布式缓存接口
+            services.AddDistributedMemoryCache();  // 分布式缓存接口， 这里使用本机内存缓存
             services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));// 解决中文乱码
             services.AddHttpClient();   // IHttpClientFactory
 
-            IConfigurationSection quartzConfiguration = Configuration.GetSection("Quartz"); // Quartz配置节点
-
             /***********Quartz.NET*********/
+            IConfigurationSection quartzConfiguration = Configuration.GetSection("Quartz"); // Quartz配置节点
             services.AddTransient<HttpJob>();   // 注册job至容器，必须步骤
             services.AddQuartz(config =>
             {

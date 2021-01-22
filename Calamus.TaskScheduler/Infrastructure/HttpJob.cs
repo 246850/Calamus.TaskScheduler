@@ -18,13 +18,13 @@ namespace Calamus.TaskScheduler.Infrastructure
         }
         public async Task Execute(IJobExecutionContext context)
         {
-            string requestUrl = context.JobDetail.JobDataMap.GetString(DataKeys.RequestUrl);
-            int httpMethod = context.JobDetail.JobDataMap.GetInt(DataKeys.HttpMethod);
+            string requestUrl = context.JobDetail.JobDataMap.GetRequestUrl();
+            int httpMethod = context.JobDetail.JobDataMap.GetHttpMethod();
             string result;
             if (httpMethod == (int)HttpMethodEnum.Post)
             {
-                string requestBody = context.JobDetail.JobDataMap.GetString(DataKeys.RequestBody);
-                HttpResponseMessage response = await _http.PostAsync(requestUrl, new StringContent(requestBody ?? string.Empty, Encoding.UTF8, "application/json"));
+                string requestBody = context.JobDetail.JobDataMap.GetRequestBody();
+                HttpResponseMessage response = await _http.PostAsync(requestUrl, new StringContent(requestBody, Encoding.UTF8, "application/json"));
                 result = await response.Content.ReadAsStringAsync();
             }
             else
@@ -32,7 +32,7 @@ namespace Calamus.TaskScheduler.Infrastructure
                 result = await _http.GetStringAsync(requestUrl);
             }
 
-            List<string> list = (context.JobDetail.JobDataMap[DataKeys.LogList] as List<string>) ?? new List<string>();
+            List<string> list = context.JobDetail.JobDataMap.GetLogList();
             while (list.Count >= 20)
             {
                 list.RemoveAt(list.Count - 1);// 最大保存日志数量 20 条

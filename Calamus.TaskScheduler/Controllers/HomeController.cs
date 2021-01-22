@@ -82,19 +82,19 @@ namespace Calamus.TaskScheduler.Controllers
                     Name = job.Key.Name,
                     Group = job.Key.Group,
                     TriggerState = TriggerState.Complete,
-                    HttpMethod = job.JobDataMap.GetInt(DataKeys.HttpMethod),
-                    RequestUrl = job.JobDataMap.GetString(DataKeys.RequestUrl),
-                    TriggerType = job.JobDataMap.GetInt(DataKeys.TriggerType),
-                    Interval = job.JobDataMap.GetInt(DataKeys.Interval),
-                    IntervalType = job.JobDataMap.GetInt(DataKeys.IntervalType),
-                    RepeatCount = job.JobDataMap.GetInt(DataKeys.RepeatCount),
-                    Cron = job.JobDataMap.GetString(DataKeys.Cron),
-                    RequestBody = job.JobDataMap.GetString(DataKeys.RequestBody),
+                    HttpMethod = job.JobDataMap.GetHttpMethod(),
+                    RequestUrl = job.JobDataMap.GetRequestUrl(),
+                    TriggerType = job.JobDataMap.GetTriggerType(),
+                    Interval = job.JobDataMap.GetInterval(),
+                    IntervalType = job.JobDataMap.GetIntervalType(),
+                    RepeatCount = job.JobDataMap.GetRepeatCount(),
+                    Cron = job.JobDataMap.GetCron(),
+                    RequestBody = job.JobDataMap.GetRequestBody(),
                     Description = job.Description,
-                    CreateTime = job.JobDataMap.GetDateTime(DataKeys.CreateTime),
-                    StartTime = job.JobDataMap.GetDateTime(DataKeys.StartTime),
-                    EndTime = string.IsNullOrWhiteSpace(job.JobDataMap.GetString(DataKeys.EndTime)) ? null : job.JobDataMap.GetDateTime(DataKeys.EndTime),
-                    LastException = job.JobDataMap.GetString(DataKeys.LastException)
+                    CreateTime = job.JobDataMap.GetCreateTime(),
+                    StartTime = job.JobDataMap.GetStartTime(),
+                    EndTime = job.JobDataMap.GetEndTime(),
+                    LastException = job.JobDataMap.GetLastException()
                 };
 
                 IReadOnlyCollection<ITrigger> triggers = await _scheduler.GetTriggersOfJob(key);
@@ -144,16 +144,16 @@ namespace Calamus.TaskScheduler.Controllers
                 {
                     Name = job.Key.Name,
                     Group = job.Key.Group,
-                    HttpMethod = job.JobDataMap.GetInt(DataKeys.HttpMethod),
-                    RequestUrl = job.JobDataMap.GetString(DataKeys.RequestUrl),
-                    StartTime = job.JobDataMap.GetDateTime(DataKeys.StartTime),
-                    EndTime = string.IsNullOrWhiteSpace(job.JobDataMap.GetString(DataKeys.EndTime)) ? null : job.JobDataMap.GetDateTime(DataKeys.EndTime),
-                    TriggerType = job.JobDataMap.GetInt(DataKeys.TriggerType),
-                    Interval = job.JobDataMap.GetInt(DataKeys.Interval),
-                    IntervalType = job.JobDataMap.GetInt(DataKeys.IntervalType),
-                    RepeatCount = job.JobDataMap.GetInt(DataKeys.RepeatCount),
-                    Cron = job.JobDataMap.GetString(DataKeys.Cron),
-                    RequestBody = job.JobDataMap.GetString(DataKeys.RequestBody),
+                    HttpMethod = job.JobDataMap.GetHttpMethod(),
+                    RequestUrl = job.JobDataMap.GetRequestUrl(),
+                    StartTime = job.JobDataMap.GetStartTime(),
+                    EndTime = job.JobDataMap.GetEndTime(),
+                    TriggerType = job.JobDataMap.GetTriggerType(),
+                    Interval = job.JobDataMap.GetInterval(),
+                    IntervalType = job.JobDataMap.GetIntervalType(),
+                    RepeatCount = job.JobDataMap.GetRepeatCount(),
+                    Cron = job.JobDataMap.GetCron(),
+                    RequestBody = job.JobDataMap.GetRequestBody(),
                     Description = job.Description,
                     IsUpdate = true
                 };
@@ -287,16 +287,16 @@ namespace Calamus.TaskScheduler.Controllers
         {
             JobKey key = new JobKey(name.Trim(), group.Trim());
             IJobDetail job = await _scheduler.GetJobDetail(key);
-            List<string> models = (job.JobDataMap[DataKeys.LogList] as List<string>) ?? new List<string>();
+            List<string> models = job.JobDataMap.GetLogList();
             return View(models);
         }
 
-        [HttpGet]
-        public IActionResult Clear()
-        {
-            _scheduler.Clear();
-            return Ok("清空完成");
-        }
+        //[HttpGet]
+        //public IActionResult Clear()
+        //{
+        //    _scheduler.Clear();
+        //    return Ok("清空完成");
+        //}
 
         [HttpGet]
         public async Task<IActionResult> Info()
@@ -379,7 +379,7 @@ namespace Calamus.TaskScheduler.Controllers
         [HttpGet]
         public async Task<IActionResult> Notice()
         {
-            EmailConfigModel model = new EmailConfigModel();
+            EmailConfigRequest model = new EmailConfigRequest();
             IJobDetail job = await _scheduler.GetJobDetail(new JobKey(EmailJobKeys.NameKey, EmailJobKeys.GroupKey));
             if (job != null)
             {
@@ -396,7 +396,7 @@ namespace Calamus.TaskScheduler.Controllers
 
         [HttpPost]
         [ModelValidatorFilter]
-        public async Task Notice(EmailConfigModel request)
+        public async Task Notice(EmailConfigRequest request)
         {
             JobKey key = new JobKey(EmailJobKeys.NameKey, EmailJobKeys.GroupKey);
             JobDataMap dataMap = new JobDataMap();
