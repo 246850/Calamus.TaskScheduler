@@ -1,10 +1,6 @@
 # Calamus.TaskScheduler
 基于Asp.Net Core 5.0采用Quartz.Net编写的开源任务调度Web管理平台
 
-**演示站点**
-
-http://47.101.47.193:1063/
-
 **部署步骤**
 
 ### 1、创建持久化数据库（以MySQL为例）
